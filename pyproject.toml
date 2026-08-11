@@ -1,0 +1,19 @@
+[project]
+name = "aribot"
+version = "1.0.0"
+requires-python = ">=3.13"
+dependencies = [
+    "discord>=2.3.2",
+    "django>=6.0.7",
+    "pycountry>=26.2.16",
+    "python-dotenv>=1.2.2",
+    "requests>=2.34.2",
+]
+
+[project.scripts]
+app = "app.__main__:main"
+
+[dependency-groups]
+dev = [
+    "django-types>=0.24.0",
+]
