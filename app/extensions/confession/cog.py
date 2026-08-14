@@ -20,6 +20,7 @@ class Confessions(commands.GroupCog, name="confession"):
         self.reports: dict[int, set[int]] = {}
 
     @app_commands.command()
+    @app_commands.checks.cooldown(1, 5, key=lambda i: i.user.id)
     async def report(self, interaction: discord.Interaction, id: str):
         """
         Reports a confession. If a confession recieves three reports, it will be reviewed by a moderator.
@@ -71,6 +72,7 @@ class Confessions(commands.GroupCog, name="confession"):
         )
 
     @app_commands.command()
+    @app_commands.checks.cooldown(1, 5, key=lambda i: i.user.id)
     async def like(self, interaction: discord.Interaction, id: str):
         """
         Adds or removes a like from a confession.
@@ -111,6 +113,30 @@ class Confessions(commands.GroupCog, name="confession"):
         await sync_confession_message(channel, confession)
 
     @app_commands.command()
+    @app_commands.checks.cooldown(1, 10, key=lambda i: i.user.id)
+    async def sync(self, interaction: discord.Interaction):
+        """
+        Syncs the last confession message. If confession buttons aren't working, this command will fix it.
+        """
+        await interaction.response.defer(thinking=True, ephemeral=True)
+
+        channel = await fetch_channel(self.bot)
+
+        if not channel:
+            await interaction.followup.send("Confession channel could not be found.")
+            return
+
+        confession = await Confession.objects.alast()
+
+        if not confession:
+            await interaction.followup.send("No confessions have been sent yet.")
+            return
+
+        await sync_confession_message(channel, confession)
+        await interaction.followup.send("Confession message synced!")
+
+    @app_commands.command()
+    @app_commands.checks.cooldown(1, 5, key=lambda i: i.user.id)
     async def send(self, interaction: discord.Interaction, reply_id: str | None = None):
         """
         Sends an anonymous confession.
