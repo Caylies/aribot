@@ -15,4 +15,5 @@ async def toggle_like(user_id: int, confession: Confession) -> bool:
         amount = -1
 
     await Confession.objects.filter(pk=confession.pk).aupdate(likes=F("likes") + amount)
+    await confession.arefresh_from_db()
     return created
